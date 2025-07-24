@@ -1,0 +1,257 @@
+services:
+  bff_service:
+    build:
+      context: ./bff_service
+      dockerfile: Dockerfile
+    ports:
+      - "8003:8003"
+    environment:
+      BFF__HTTP_HOST: "0.0.0.0"
+      BFF__HTTP_PORT: "8003"
+      JWT_SECRET: "your_jwt_secret"
+      GIN_MODE: "debug"
+      USERS_HTTP_SERVICE_URL: "http://user_service:8001"
+      CORE_DATA_SERVICE_HTTP_SERVICE_URL: "http://core_data_service:8002"
+      ZULU_SERVICE_HTTP_SERVICE_URL: "http://zulu_service:8004"
+    volumes:
+      - ./bff_service:/code
+    working_dir: /code
+    depends_on:
+      - user_service
+      - core_data_service
+      - zulu_service
+
+  core_data_service:
+    build:
+      context: ./core_data_service
+      dockerfile: Dockerfile
+    ports:
+      - "8002:8002"
+    environment:
+      - PYTHONPATH=/app:/app/src:/app/src/
+      - CORE__APP_HOST=0.0.0.0
+      - CORE__APP_PORT=8002
+      - LOGGING_LEVEL=20
+      - DEBUG=1
+      - CORE__POSTGRES_DB_LOGIN=user
+      - CORE__POSTGRES_DB_PASSWORD=pass
+      - CORE__POSTGRES_DB_HOST=db
+      - CORE__POSTGRES_DB_PORT=5432
+      - CORE__POSTGRES_DB_NAME=root
+      - CORE__SQLALCHEMY_ECHO=False
+      - CORE__SQLALCHEMY_POOL_SIZE=5
+    volumes:
+      - ./core_data_service:/app
+    working_dir: /app
+    depends_on:
+      - db
+
+  lers_integration_service:
+    build:
+      context: ./lers_integration_service
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN=admin
+      - POSTGRES_DB_PASSWORD=ZpVurRuj5AHX4C4W@uKt
+      - POSTGRES_DB_HOST=db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME=postgres_db
+      - POSTGRESQL_URL=postgres://admin:ZpVurRuj5AHX4C4W@uKt@db:5432/postgres_db?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS=1
+      - TESTS_BASE_DIR=/code/tests
+    volumes:
+      - ./lers_integration_service:/code
+    working_dir: /code
+    depends_on:
+      - db
+
+  scada_consumer:
+    build:
+      context: ./scada_consumer
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN=scada_admin
+      - POSTGRES_DB_PASSWORD=scada_pass
+      - POSTGRES_DB_HOST=scada_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME=scada_db
+      - POSTGRESQL_URL=postgres://scada_admin:scada_pass@scada_db:5432/scada_db?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS=1
+      - TESTS_BASE_DIR=/code/tests
+      - RABBITMQ_URL=amqp://admin:pYEDBqnMLoWWE@rabbitmq:5672/
+      - RABBITMQ_CONSUMER_QUEUE=test
+      - RABBITMQ_CONSUMER_TAG=tag
+      - RABBITMQ_DAILY_QUEUE=DAILY
+      - RABBITMQ_ASAP_QUEUE=ASAP
+      - RABBITMQ_10MIN_QUEUE=10MIN
+    volumes:
+      - ./scada_consumer:/code
+    working_dir: /code
+    depends_on:
+      - scada_db
+      - rabbitmq
+
+  user_service:
+    build:
+      context: ./user_service
+      dockerfile: Dockerfile
+    ports:
+      - "8001:8001"
+    environment:
+      - USER__POSTGRES_DB_LOGIN=scada_admin
+      - USER__POSTGRES_DB_PASSWORD=scada_pass
+      - USER__POSTGRES_DB_HOST=user_db
+      - USER__POSTGRES_DB_PORT=5434
+      - USER__POSTGRES_DB_NAME=user_db
+      - USER__MAX_CONNECTIONS=1
+      - USER__CONNECTION_IDLE_TIME_SEC=10
+      - USER_SERVICE_POSTGRESQL_URL=postgres://scada_admin:scada_pass@user_db:5434/user_db?sslmode=disable
+      - USER__HTTP_HOST=0.0.0.0
+      - USER__HTTP_PORT=8001
+      - GIN_MODE=release
+    volumes:
+      - ./user_service:/app
+    working_dir: /app
+    depends_on:
+      - user_db
+
+  weather_station_data_collector:
+    build:
+      context: ./weather_station_data_collector
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN=scada_admin
+      - POSTGRES_DB_PASSWORD=scada_pass
+      - POSTGRES_DB_HOST=user_db
+      - POSTGRES_DB_PORT=5434
+      - POSTGRES_DB_NAME=user_db
+      - MAX_CONNECTIONS=1
+      - CONNECTION_IDLE_TIME_SEC=10
+      - CHECK_GAP_SECONDS=120
+      - CHECK_FAILED_TIME_GAP_SECONDS=14400
+      - WEATHER_STATION_BASE_URL=https://94.25.30.59:3000
+      - FORECAST_API_TOKEN=forecast_token
+      - FORECAST_BASE_URL=https://api.openweathermap.org
+      - USER_SERVICE_POSTGRESQL_URL=postgres://scada_admin:scada_pass@user_db:5434/user_db?sslmode=disable
+    volumes:
+      - ./weather_station_data_collector:/app
+    working_dir: /app
+    depends_on:
+      - user_db
+
+  zulu_service:
+    build:
+      context: ./zulu_service
+      dockerfile: Dockerfile
+    ports:
+      - "8004:8004"
+    environment:
+      - ZULU__POSTGRES_DB_LOGIN=zulu_admin
+      - ZULU__POSTGRES_DB_PASSWORD=aN*HRPP723Z89ju
+      - ZULU__POSTGRES_DB_HOST=zulu_db
+      - ZULU__POSTGRES_DB_PORT=5434
+      - ZULU__POSTGRES_DB_NAME=zulu
+      - ZULU__MAX_CONNECTIONS=1
+      - ZULU__CONNECTION_IDLE_TIME_SEC=10
+      - ZULU_SERVICE_POSTGRESQL_URL=postgres://zulu_admin:aN*HRPP723Z89ju@zulu_db:5434/zulu?sslmode=disable
+      - ZULU__HTTP_HOST=0.0.0.0
+      - ZULU__HTTP_PORT=8004
+      - GIN_MODE=debug
+    volumes:
+      - ./zulu_service:/app
+    working_dir: /app
+    depends_on:
+      - zulu_db
+
+  zulu_updater:
+    build:
+      context: ./zulu_updater
+      dockerfile: Dockerfile
+    environment:
+      - ELEM_ID=3580
+      - ZULU_CONNECTION_IDLE_TIME_SEC=100000
+      - ZULU_POSTGRES_MAX_CONNECTIONS=100
+      - ROOT_CONNECTION_IDLE_TIME_SEC=100000
+      - ROOT_POSTGRES_MAX_CONNECTIONS=100
+      - WEATHER_BASE_URL=https://panel.urusneva.ru
+      - ZULU_BASE_URL=http://89.223.70.228:6473
+      - ZULU_LAYER=layer
+      - ZULU_TOKEN=token
+      - ZULU_POSTGRES_DB_NAME=name
+      - ZULU_POSTGRES_DB_PORT=port
+      - ZULU_POSTGRES_DB_HOST=host
+      - ZULU_POSTGRES_DB_PASSWORD=password
+      - ZULU_POSTGRES_DB_LOGIN=login
+      - ZULU_POSTGRESQL_URL=postgres://login:password@host:port/name?sslmode=disable
+      - ROOT_POSTGRES_DB_NAME=name
+      - ROOT_POSTGRES_DB_PORT=port
+      - ROOT_POSTGRES_DB_HOST=host
+      - ROOT_POSTGRES_DB_PASSWORD=password
+      - ROOT_POSTGRES_DB_LOGIN=login
+      - ROOT_POSTGRESQL_URL=postgres://login:password@host:port/name?sslmode=disable
+    volumes:
+      - ./zulu_updater:/app
+    working_dir: /app
+
+  # Базы данных
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: root
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  scada_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: scada_admin
+      POSTGRES_PASSWORD: scada_pass
+      POSTGRES_DB: scada_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - scada_postgres_data:/var/lib/postgresql/data
+
+  user_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: scada_admin
+      POSTGRES_PASSWORD: scada_pass
+      POSTGRES_DB: user_db
+    ports:
+      - "5434:5432"
+    volumes:
+      - user_postgres_data:/var/lib/postgresql/data
+
+  zulu_db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: zulu_admin
+      POSTGRES_PASSWORD: aN*HRPP723Z89ju
+      POSTGRES_DB: zulu
+    ports:
+      - "5435:5432"
+    volumes:
+      - zulu_postgres_data:/var/lib/postgresql/data
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: admin
+      RABBITMQ_DEFAULT_PASS: pYEDBqnMLoWWE
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+
+volumes:
+  postgres_data:
+  scada_postgres_data:
+  user_postgres_data:
+  zulu_postgres_data:
+  rabbitmq_data:

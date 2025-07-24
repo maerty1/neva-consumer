@@ -17,4 +17,4 @@ ENV PYTHONPATH=/code/src:/code/src/app
 
 WORKDIR /code/src
 
-CMD uvicorn app:app --host $CORE__APP_HOST --port $CORE__APP_PORT
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8002"]

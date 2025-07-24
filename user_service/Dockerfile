@@ -1,13 +1,17 @@
-FROM golang:1.22.6
+FROM golang:1.22.6 as builder
 
 WORKDIR /code
+COPY . .
 
-COPY go.mod go.sum ./
+RUN go mod download && \
+    CGO_ENABLED=0 GOOS=linux go build -ldflags="-w -s" -o /code/output cmd/main.go && \
+    chmod +x /code/output
 
-RUN go mod download
+FROM gcr.io/distroless/base-debian11
 
-COPY . . 
+WORKDIR /code
+COPY --from=builder /code/output /code/
 
-RUN go build -o output cmd/main.go
+USER nonroot:nonroot
 
-CMD ["./output"]
+CMD ["/code/output"]
