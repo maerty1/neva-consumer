@@ -28,7 +28,7 @@ services:
     ports:
       - "8002:8002"
     environment:
-      - PYTHONPATH=/app:/app/src:/app/src/
+      - PYTHONPATH=/code:/code/src:/code/src/
       - CORE__APP_HOST=0.0.0.0
       - CORE__APP_PORT=8002
       - LOGGING_LEVEL=20
@@ -41,8 +41,8 @@ services:
       - CORE__SQLALCHEMY_ECHO=False
       - CORE__SQLALCHEMY_POOL_SIZE=5
     volumes:
-      - ./core_data_service:/app
-    working_dir: /app
+      - ./core_data_service:/code
+    working_dir: /code
     depends_on:
       - db
 
@@ -110,8 +110,8 @@ services:
       - USER__HTTP_PORT=8001
       - GIN_MODE=release
     volumes:
-      - ./user_service:/app
-    working_dir: /app
+      - ./user_service:/code
+    working_dir: /code
     depends_on:
       - user_db
 
@@ -134,8 +134,8 @@ services:
       - FORECAST_BASE_URL=https://api.openweathermap.org
       - USER_SERVICE_POSTGRESQL_URL=postgres://scada_admin:scada_pass@user_db:5434/user_db?sslmode=disable
     volumes:
-      - ./weather_station_data_collector:/app
-    working_dir: /app
+      - ./weather_station_data_collector:/code
+    working_dir: /code
     depends_on:
       - user_db
 
@@ -158,8 +158,8 @@ services:
       - ZULU__HTTP_PORT=8004
       - GIN_MODE=debug
     volumes:
-      - ./zulu_service:/app
-    working_dir: /app
+      - ./zulu_service:/code
+    working_dir: /code
     depends_on:
       - zulu_db
 
@@ -190,8 +190,8 @@ services:
       - ROOT_POSTGRES_DB_LOGIN=login
       - ROOT_POSTGRESQL_URL=postgres://login:password@host:port/name?sslmode=disable
     volumes:
-      - ./zulu_updater:/app
-    working_dir: /app
+      - ./zulu_updater:/code
+    working_dir: /code
 
   # Базы данных
   db:
