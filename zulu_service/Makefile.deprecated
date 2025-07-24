@@ -1,0 +1,70 @@
+# Makefile для управления проектом на Docker.
+#
+# Инструкции:
+# - Для добавления новой команды определите новую цель и добавьте комментарий перед ней,
+#   чтобы описание было видно при вызове 'make help'.
+# - Для использования docker-compose с определенными настройками используйте функцию DOCKER_COMPOSE_UP.
+#
+# Пример: 
+#
+# # my-command: Мое описание для команды
+# my-command: 
+#   <ваш код команды>
+
+# Задаем переменные с именами файлов и переменных окружения
+LOCAL_ENV_FILE := env/local.sh
+PROD_ENV_FILE := env/prod.sh
+TEST_ENV_FILE := env/test.sh
+
+LOCAL_COMPOSE_FILE := docker/local-docker-compose.yml
+PROD_COMPOSE_FILE := docker/prod-docker-compose.yml
+TEST_COMPOSE_FILE := docker/test-docker-compose.yml
+
+# Определяем функции
+define DOCKER_COMPOSE_UP
+source $(1) && docker compose -f $(2) up $(3) -d
+endef
+
+# Базовые команды
+
+## local: Запуск локальной среды
+local:
+	$(call CHECK_FILE_EXISTS,./docker/init-scripts/dump.sql)
+	$(call DOCKER_COMPOSE_UP,$(LOCAL_ENV_FILE),$(LOCAL_COMPOSE_FILE),)
+
+## prod: Запуск prod среды
+prod:
+	$(call DOCKER_COMPOSE_UP,$(PROD_ENV_FILE),$(PROD_COMPOSE_FILE),)
+
+## test: Запуск тестов
+test:
+	$(call DOCKER_COMPOSE_UP,$(TEST_ENV_FILE),$(TEST_COMPOSE_FILE),--build)
+
+# Дополнительные команды для сборки и запуска
+
+## local-build: Запуск локальной среды с опцией сборки
+local-build:
+	$(call CHECK_FILE_EXISTS,./docker/init-scripts/dump.sql)
+	$(call DOCKER_COMPOSE_UP,$(LOCAL_ENV_FILE),$(LOCAL_COMPOSE_FILE),--build)
+
+## prod-build: Запуск prod среды с опцией сборки	
+prod-build:
+	$(call DOCKER_COMPOSE_UP,$(PROD_ENV_FILE),$(PROD_COMPOSE_FILE),--build)
+
+## docs: Генерация документации
+# go install github.com/swaggo/swag/cmd/swag@latest
+# export PATH=$PATH:$(go env GOPATH)/bin
+doc:
+	swag init -g cmd/main.go
+
+help:
+	@echo "Доступные команды:"
+	@echo ""
+	@fgrep -h "##" $(MAKEFILE_LIST) | fgrep -v fgrep | sed -e 's/\\$$//' | sed -e 's/##//'
+	@echo ""
+
+define CHECK_FILE_EXISTS
+@if [ ! -f $1 ]; then \
+    echo "\033[33mWarning: Файл $1 не найден.\033[0m"; \
+fi
+endef

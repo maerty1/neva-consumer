@@ -1,0 +1,109 @@
+name: integration_service
+
+services:
+  lers_synchronizer:
+    profiles: ["sync"]
+    restart: no
+    container_name: syncer
+    build:
+      context: ../
+      dockerfile: synchronizer.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal
+
+  lers_poller:
+    profiles: ["poller"]
+    restart: no
+    container_name: poller
+    build:
+      context: ../
+      dockerfile: poller.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal
+
+  lers_retryer:
+    profiles: ["retryer"]
+    container_name: retryer
+    restart: no
+    build:
+      context: ../
+      dockerfile: retryer.Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_DB_LOGIN}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_NAME}
+      - PGUSER=${POSTGRES_DB_LOGIN}
+    ports:
+      - "${POSTGRES_DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      timeout: 2s
+      retries: 15
+
+  lers_integrator:
+    profiles: ["main"]
+    container_name: lers_integrator
+    restart: no
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal

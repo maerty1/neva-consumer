@@ -1,0 +1,743 @@
+definitions:
+  geodata.Category:
+    properties:
+      id:
+        type: integer
+      is_open:
+        type: boolean
+      max_values:
+        type: integer
+      name:
+        example: Метрики
+        type: string
+      type:
+        example: group
+        type: string
+    type: object
+  geodata.ElementData:
+    properties:
+      inserted_ts:
+        example: "2024-10-08T10:56:45.531005Z"
+        type: string
+      parameter:
+        example: sys
+        type: string
+      record_type:
+        example: static
+        type: string
+      val:
+        example: "1"
+        type: string
+    type: object
+  geodata.FullElementData:
+    properties:
+      address:
+        type: string
+      packets:
+        additionalProperties:
+          additionalProperties:
+            $ref: '#/definitions/geodata.Measurement'
+          type: object
+        type: object
+      title:
+        type: string
+    type: object
+  geodata.GetPointDataByCategoryGroup:
+    properties:
+      measurements:
+        additionalProperties:
+          additionalProperties:
+            $ref: '#/definitions/geodata.GroupMeasurement'
+          type: object
+        type: object
+    type: object
+  geodata.GetPointDataByCategoryKeyvalue:
+    properties:
+      measurements:
+        items:
+          $ref: '#/definitions/geodata.MeasurementKeyvalue'
+        type: array
+    type: object
+  geodata.GetPointsDataByCategoryGroup:
+    properties:
+      measurements:
+        additionalProperties:
+          $ref: '#/definitions/geodata.GroupMeasurement'
+        type: object
+    type: object
+  geodata.GroupMeasurement:
+    properties:
+      calculated_data:
+        $ref: '#/definitions/geodata.GroupMeasurementsCalculatedData'
+      data:
+        $ref: '#/definitions/geodata.GroupMeasurementsData'
+      lers_coeff:
+        type: number
+      name:
+        example: Температура
+        type: string
+      rn:
+        type: integer
+      unit:
+        example: атм
+        type: string
+      zulu_coeff:
+        type: number
+    type: object
+  geodata.GroupMeasurementsCalculatedData:
+    properties:
+      in:
+        type: number
+      out:
+        type: number
+    type: object
+  geodata.GroupMeasurementsData:
+    properties:
+      in:
+        example: T_in
+        type: string
+      out:
+        example: T_out
+        type: string
+    type: object
+  geodata.Measurement:
+    properties:
+      calculated_data:
+        $ref: '#/definitions/geodata.MeasurementCalculatedData'
+      data:
+        $ref: '#/definitions/geodata.MeasurementData'
+      lers_coeff:
+        type: number
+      name:
+        type: string
+      unit:
+        type: string
+      zulu_coeff:
+        type: number
+    type: object
+  geodata.MeasurementCalculatedData:
+    properties:
+      in:
+        type: number
+      out:
+        type: number
+    type: object
+  geodata.MeasurementData:
+    properties:
+      in:
+        type: string
+      out:
+        type: string
+    type: object
+  geodata.MeasurementGroup:
+    properties:
+      coeff:
+        type: number
+      i:
+        example: T_in
+        type: string
+      o:
+        example: T_out
+        type: string
+    type: object
+  geodata.MeasurementGroupEnum:
+    properties:
+      name:
+        example: Температура
+        type: string
+      unit:
+        example: °C
+        type: string
+    type: object
+  geodata.MeasurementKeyvalue:
+    properties:
+      name:
+        example: Температура
+        type: string
+      rn:
+        type: integer
+      source:
+        example: zulu/scada
+        type: string
+      unit:
+        example: атм
+        type: string
+      value: {}
+    type: object
+  geodata.ObjectState:
+    properties:
+      image:
+        description: Изображение состояния в формате data URL (base64)
+        example: data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYA
+        type: string
+      title:
+        example: Разветвление
+        type: string
+      zws_mode:
+        example: 2
+        type: integer
+      zws_type:
+        example: 2
+        type: integer
+    type: object
+  geodata.ObjectStatesResponse:
+    properties:
+      states:
+        description: Массив состояний объектов
+        items:
+          $ref: '#/definitions/geodata.ObjectState'
+        type: array
+    type: object
+  geodata.PipelineDepth:
+    properties:
+      avg_h_geo:
+        type: number
+      end_h_geo:
+        type: number
+      start_h_geo:
+        type: number
+    type: object
+  geodata.Point:
+    properties:
+      address:
+        example: Улица Пушкина 12
+        type: string
+      coordinates:
+        example:
+        - 55.751244
+        - 37.618423
+        items:
+          type: number
+        type: array
+      elem_id:
+        type: integer
+      has_accident:
+        type: boolean
+      measurement_groups:
+        additionalProperties:
+          $ref: '#/definitions/geodata.MeasurementGroup'
+        type: object
+      title:
+        example: Котельная 22
+        type: string
+      type:
+        type: integer
+    type: object
+  geodata.PointWithCategories:
+    properties:
+      address:
+        example: Улица Пушкина 12
+        type: string
+      categories:
+        items:
+          $ref: '#/definitions/geodata.Category'
+        type: array
+      title:
+        example: Котельная 22
+        type: string
+      type:
+        type: integer
+    type: object
+  geojson.GeoJSONFeature:
+    properties:
+      geometry:
+        allOf:
+        - $ref: '#/definitions/geojson.Geometry'
+        description: Геометрия объекта
+      id:
+        description: Уникальный идентификатор объекта
+        example: 1320
+        type: integer
+      properties:
+        allOf:
+        - $ref: '#/definitions/geojson.Properties'
+        description: Свойства объекта
+      type:
+        description: Тип объекта, всегда "Feature"
+        example: Feature
+        type: string
+    type: object
+  geojson.GeoJSONFeatureCollection:
+    properties:
+      features:
+        description: Массив объектов Feature
+        items:
+          $ref: '#/definitions/geojson.GeoJSONFeature'
+        type: array
+      type:
+        description: Тип объекта, всегда "FeatureCollection"
+        example: FeatureCollection
+        type: string
+    type: object
+  geojson.GeoJSONFeatureCollectionV2:
+    properties:
+      features:
+        description: Массив объектов Feature
+        items:
+          $ref: '#/definitions/geojson.GeoJSONFeatureV2'
+        type: array
+      type:
+        description: Тип объекта, всегда "FeatureCollection"
+        example: FeatureCollection
+        type: string
+    type: object
+  geojson.GeoJSONFeatureV2:
+    properties:
+      geometry:
+        allOf:
+        - $ref: '#/definitions/geojson.Geometry'
+        description: Геометрия объекта
+      id:
+        description: Уникальный идентификатор объекта
+        example: 1320
+        type: integer
+      properties:
+        allOf:
+        - $ref: '#/definitions/geojson.PropertiesV2'
+        description: Свойства объекта
+      type:
+        description: Тип объекта, всегда "Feature"
+        example: Feature
+        type: string
+    type: object
+  geojson.Geometry:
+    properties:
+      coordinates:
+        description: Координаты геометрии
+        items:
+          items:
+            type: number
+          type: array
+        type: array
+      type:
+        description: Тип геометрии, например, "LineString"
+        example: LineString
+        type: string
+    type: object
+  geojson.Properties:
+    properties:
+      elem_id:
+        description: Идентификатор элемента
+        example: 1320
+        type: integer
+      parent_id:
+        description: Идентификатор родительского элемента
+        example: 3058
+        type: integer
+      zws_linecolor:
+        description: Цвет линии в формате целого числа
+        example: 10966016
+        type: integer
+      zws_mode:
+        description: Режим объекта
+        example: 1
+        type: integer
+      zws_type:
+        description: Тип объекта
+        example: 6
+        type: integer
+    type: object
+  geojson.PropertiesV2:
+    properties:
+      Adres:
+        example: Пушкина 15
+        type: string
+      Name:
+        example: П-427
+        type: string
+      elem_id:
+        description: Идентификатор элемента
+        example: 1320
+        type: integer
+      parent_id:
+        description: Идентификатор родительского элемента
+        example: 3058
+        type: integer
+      zws_linecolor:
+        description: Цвет линии в формате целого числа
+        example: 10966016
+        type: integer
+      zws_mode:
+        description: Режим объекта
+        example: 1
+        type: integer
+      zws_type:
+        description: Тип объекта
+        example: 6
+        type: integer
+    type: object
+  reports.BiDashboardFrame:
+    properties:
+      block_id:
+        type: integer
+      block_name:
+        example: Котельная №16
+        type: string
+      qsum:
+        example: 23.13
+        type: number
+    type: object
+info:
+  contact: {}
+  description: API сервис получения данных зулу
+  title: Zulu Service API
+  version: "1.0"
+paths:
+  /zulu/api/v1/bi_dashboard/frame/1:
+    get:
+      description: Каждый блок — это `Источник` (котельные)
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/reports.BiDashboardFrame'
+            type: array
+      summary: Получение первого фрейма BI дашборда
+      tags:
+      - BI
+  /zulu/api/v1/bi_dashboard/frame/2/{element_id}:
+    get:
+      description: Переменная element_id `Источник` получается из первого
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/reports.BiDashboardFrame'
+            type: array
+      summary: Получение второго фрейма BI дашборда
+      tags:
+      - BI
+  /zulu/api/v1/bi_dashboard/frame/3/{element_id}:
+    get:
+      description: Переменная element_id `ЦТП` получается из второго кадра
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/reports.BiDashboardFrame'
+            type: array
+      summary: Получение третьего фрейма BI дашборда
+      tags:
+      - BI
+  /zulu/api/v1/bi_dashboard/frame/3/{element_id}/others:
+    get:
+      description: Переменная element_id `Источник` получается из первого кадра. Используется
+        для детализации информации по блоку `Остальное` из второго фрейма
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/reports.BiDashboardFrame'
+            type: array
+      summary: Получение третьего фрейма BI дашборда при нажатии на "Остальное"
+      tags:
+      - BI
+  /zulu/api/v1/elements/{element_id}:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список значений объектов
+          schema:
+            $ref: '#/definitions/geodata.ElementData'
+      summary: Получение значений объектов
+      tags:
+      - Geojson
+  /zulu/api/v1/enums/measurement_groups:
+    get:
+      description: 'Возвращает словарь групп измерений, где ключ — ID группы. `{"1":
+        {"name": "Температура", "unit": "°C"}, "2": {"name": "Давление", "unit": "атм"}}`'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/geodata.MeasurementGroupEnum'
+            type: object
+      summary: Получение значений объектов
+      tags:
+      - Enums
+  /zulu/api/v1/filtered_points:
+    post:
+      parameters:
+      - collectionFormat: csv
+        description: ID типов объектов для фильтрации
+        in: query
+        items:
+          type: integer
+        name: zws_type_id
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/geodata.Point'
+            type: array
+      summary: Получение значений объектов
+      tags:
+      - Internal
+  /zulu/api/v1/geojson:
+    get:
+      description: Возвращает коллекцию географических объектов в формате GeoJSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          schema:
+            $ref: '#/definitions/geojson.GeoJSONFeatureCollection'
+      summary: Получение GeoJSON данных
+      tags:
+      - Geojson
+  /zulu/api/v1/pipeline_depths:
+    get:
+      description: Получение глубину нахождения труб под землей
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/geodata.PipelineDepth'
+            type: object
+      summary: Получение глубину нахождения труб под землей
+      tags:
+      - Pipeline
+  /zulu/api/v1/points:
+    get:
+      parameters:
+      - collectionFormat: csv
+        description: ID типов объектов
+        in: query
+        items:
+          type: integer
+        name: zws_type_id
+        type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/geodata.Point'
+            type: array
+      summary: Получение значений объектов
+      tags:
+      - Points
+  /zulu/api/v1/points/{element_id}/categories:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/geodata.PointWithCategories'
+      tags:
+      - Categories
+  /zulu/api/v1/points/{element_id}/categories/{category_id}:
+    get:
+      parameters:
+      - description: Type of data
+        enum:
+        - group
+        - keyvalue
+        in: query
+        name: type
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Ответ для type=group
+          schema:
+            $ref: '#/definitions/geodata.GetPointDataByCategoryGroup'
+        "201":
+          description: Ответ для type=keyvalue
+          schema:
+            $ref: '#/definitions/geodata.GetPointDataByCategoryKeyvalue'
+      tags:
+      - Internal
+  /zulu/api/v1/points/{element_id}/full:
+    get:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/geodata.FullElementData'
+      summary: '...'
+      tags:
+      - Internal
+  /zulu/api/v1/points/{element_id}/icon:
+    get:
+      description: Возвращает файл иконки для заданного элемента (element_id)
+      parameters:
+      - description: ID элемента
+        in: path
+        name: element_id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Файл иконки
+          schema:
+            type: file
+        "400":
+          description: Некорректный elementID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Файл не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить иконку по элементу
+      tags:
+      - Schemas
+  /zulu/api/v1/points/{element_id}/schema:
+    get:
+      description: Возвращает файл схемы для заданного элемента (element_id)
+      parameters:
+      - description: ID элемента
+        in: path
+        name: element_id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Файл схемы
+          schema:
+            type: file
+        "400":
+          description: Некорректный elementID
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "404":
+          description: Файл не найден
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить схему по элементу
+      tags:
+      - Schemas
+  /zulu/api/v1/points/categories/:category_id:
+    get:
+      parameters:
+      - collectionFormat: csv
+        description: ID типов объектов для фильтрации
+        in: query
+        items:
+          type: integer
+        name: zws_type_id
+        type: array
+      - description: Timestamp для получения данных за конкретный период
+        in: query
+        name: timestamp
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/geodata.GetPointsDataByCategoryGroup'
+            type: object
+      summary: Получение значений объектов
+      tags:
+      - Internal
+    post:
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/geodata.GetPointsDataByCategoryGroup'
+            type: object
+      summary: '...'
+      tags:
+      - Internal
+  /zulu/api/v1/states:
+    get:
+      description: Возвращает список состояний объектов из словаря `zulu.dict_object_states`.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список состояний объектов
+          schema:
+            $ref: '#/definitions/geodata.ObjectStatesResponse'
+      summary: Получение состояний объектов
+      tags:
+      - Geojson
+  /zulu/api/v2/geojson:
+    get:
+      description: Возвращает коллекцию географических объектов в формате GeoJSON.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: GeoJSON FeatureCollection
+          schema:
+            $ref: '#/definitions/geojson.GeoJSONFeatureCollectionV2'
+      summary: Получение GeoJSON данных
+      tags:
+      - Geojson
+  /zulu/api/v2/points/categories/:category_id:
+    get:
+      parameters:
+      - collectionFormat: csv
+        description: ID типов объектов для фильтрации
+        in: query
+        items:
+          type: integer
+        name: zws_type_ids
+        type: array
+      - description: Timestamp для получения данных за конкретный период
+        in: query
+        name: timestamp
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              $ref: '#/definitions/geodata.GetPointsDataByCategoryGroup'
+            type: object
+      summary: Получение значений объектов
+      tags:
+      - Internal
+swagger: "2.0"

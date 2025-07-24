@@ -1,0 +1,33 @@
+name: dev-dp_core_data_service
+services:
+  dev-core_data_service:
+    container_name: dev-core_data_service
+    restart: unless-stopped
+    working_dir: /code/src
+    command: uvicorn --log-level debug app:app --host 0.0.0.0 --port 8002 --reload
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    environment:
+      CORE__POSTGRES_DB_LOGIN: ${POSTGRES_USER}
+      CORE__POSTGRES_DB_PASSWORD: ${POSTGRES_PASSWORD}
+      CORE__POSTGRES_DB_HOST: ${POSTGRES_HOST}
+      CORE__POSTGRES_DB_PORT: ${POSTGRES_PORT}
+      CORE__POSTGRES_DB_NAME: root
+      CORE__SQLALCHEMY_ECHO: False
+      CORE__SQLALCHEMY_POOL_SIZE: 5
+    # ports:
+    #   - "8002:8002"
+    networks:
+      - core
+      - bff
+    # volumes:
+    #   - ../src:/code/src
+
+networks:
+  core:
+    name: core
+    external: true
+  bff:
+    name: bff
+    external: true

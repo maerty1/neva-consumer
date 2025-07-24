@@ -1,0 +1,44 @@
+name: dp_local_zulu_service
+
+services:
+  zulu_api_service:
+    restart: unless-stopped
+    build: ..
+    environment:
+      ZULU__MAX_CONNECTIONS: "1"
+      ZULU__CONNECTION_IDLE_TIME_SEC: "10"
+      ZULU__HTTP_HOST: "0.0.0.0"
+      ZULU__HTTP_PORT: "8004"
+      GIN_MODE: release
+      ZULU__POSTGRESQL_URL: "postgres://${ZULU__POSTGRES_DB_LOGIN}:${ZULU__POSTGRES_DB_PASSWORD}@${ZULU__POSTGRES_DB_HOST}:5432/${ZULU__POSTGRES_DB_NAME}?sslmode=disable"
+    ports:
+      - "${ZULU__HTTP_PORT}:${ZULU__HTTP_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ../pkg:/code/pkg
+      - ../api:/code/api
+      - ../files:/code/files
+      - ../cmd:/code/cmd
+      - ../docs:/code/docs
+      - ../internal:/code/internal
+
+  db:
+    image: postgis/postgis:16-master
+    restart: unless-stopped
+    hostname: ${ZULU__POSTGRES_DB_HOST}
+    environment:
+      - POSTGRES_USER=${ZULU__POSTGRES_DB_LOGIN}
+      - POSTGRES_PASSWORD=${ZULU__POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${ZULU__POSTGRES_DB_NAME}
+      - PGUSER=${ZULU__POSTGRES_DB_LOGIN}
+    ports:
+      - "${ZULU__POSTGRES_DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d

@@ -1,0 +1,28 @@
+name: prod_dp_user_service
+
+services:
+  user_service:
+    restart: unless-stopped
+    ports:
+      - "${USER__HTTP_PORT}:${USER__HTTP_PORT}"
+    build:
+      context: ../
+      dockerfile: air.Dockerfile
+    environment:
+      - USER__POSTGRES_DB_LOGIN
+      - USER__POSTGRES_DB_PASSWORD
+      - USER__POSTGRES_DB_HOST
+      - USER__POSTGRES_DB_PORT
+      - USER__POSTGRES_DB_NAME
+      - USER__MAX_CONNECTIONS
+      - USER__CONNECTION_IDLE_TIME_SEC
+      - USER__POSTGRESQL_URL=postgres://${USER__POSTGRES_DB_LOGIN}:${USER__POSTGRES_DB_PASSWORD}@${USER__POSTGRES_DB_HOST}:6432/${USER__POSTGRES_DB_NAME}?sslmode=require
+      - USER__HTTP_HOST
+      - USER__HTTP_PORT
+      - GIN_MODE
+    volumes:
+      - ../pkg:/code/pkg
+      - ../api:/code/api
+      - ../cmd:/code/cmd
+      - ../docs:/code/docs
+      - ../internal:/code/internal

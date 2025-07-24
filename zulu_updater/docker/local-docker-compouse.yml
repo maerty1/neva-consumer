@@ -1,0 +1,47 @@
+name: zulu_updater_local
+version: "3.9"
+
+services:
+  app:
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - ELEM_ID
+      - ROOT_CONNECTION_IDLE_TIME_SEC
+      - ROOT_POSTGRES_MAX_CONNECTIONS
+      - ROOT_POSTGRESQL_URL
+      - WEATHER_BASE_URL
+      - ZULU_BASE_URL
+      - ZULU_CONNECTION_IDLE_TIME_SEC
+      - ZULU_LAYER
+      - ZULU_POSTGRES_MAX_CONNECTIONS
+      - ZULU_POSTGRES_DB_LOGIN
+      - ZULU_POSTGRES_DB_PASSWORD
+      - ZULU_POSTGRES_DB_HOST
+      - ZULU_POSTGRES_DB_PORT
+      - ZULU_POSTGRES_DB_NAME
+      - ZULU_POSTGRESQL_URL="postgres://${ZULU_POSTGRES_DB_LOGIN}:${ZULU_POSTGRES_DB_PASSWORD}@${ZULU_POSTGRES_DB_HOST}:${ZULU_POSTGRES_DB_PORT}/${ZULU_POSTGRES_DB_NAME}?sslmode=verify-ca;
+      - ROOT_POSTGRES_DB_LOGIN
+      - ROOT_POSTGRES_DB_PASSWORD
+      - ROOT_POSTGRES_DB_HOST
+      - ROOT_POSTGRES_DB_PORT
+      - ROOT_POSTGRES_DB_NAME
+      - ROOT_POSTGRESQL_URL="postgres://${ROOT_POSTGRES_DB_LOGIN}:${ROOT_POSTGRES_DB_PASSWORD}@${ROOT_POSTGRES_DB_HOST}:${ROOT_POSTGRES_DB_PORT}/${ROOT_POSTGRES_DB_NAME}?sslmode=verify-ca;
+      - ZULU_TOKEN
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_DB_LOGIN}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_NAME}
+      - PGUSER=${POSTGRES_DB_LOGIN}
+    ports:
+      - "${POSTGRES_DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      timeout: 2s
+      retries: 15

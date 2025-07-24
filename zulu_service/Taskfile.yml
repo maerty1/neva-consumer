@@ -1,0 +1,68 @@
+version: "3"
+
+vars:
+  ENV: "local"
+  ENV_FILE: "env/{{.ENV}}.sh"
+  COMPOSE_FILE: "docker/{{.ENV}}-docker-compose.yml"
+
+tasks:
+  run:
+    desc: "Запуск среды. Пример: task run ENV=local"
+    vars:
+      ENV: "{{.ENV}}"
+    preconditions:
+      - sh: test -f {{.ENV_FILE}} && test -f {{.COMPOSE_FILE}}
+        msg: |
+          Указанная среда '{{.ENV}}' недоступна. 
+          Доступные среды: task list-envs.
+          Попробуйте указать одну из доступных сред через ENV=<среда>.
+    cmds:
+      - source {{.ENV_FILE}} && docker compose -f {{.COMPOSE_FILE}} up -d
+
+  build:
+    desc: "Запуск среды с опцией сборки. Пример: task build ENV=local"
+    vars:
+      ENV: "{{.ENV}}"
+    cmds:
+      - source {{.ENV_FILE}} && docker compose -f {{.COMPOSE_FILE}} up --build -d
+  doc:
+    desc: "Генерация документации. Ссылка на установку: https://github.com/swaggo/swag"
+    cmds:
+      - swag init -g cmd/main.go
+
+  check-file:
+    desc: "Проверка существования файла"
+    vars:
+      PATH: "{{.PATH}}"
+    preconditions:
+      - sh: test -f {{.PATH}}
+        msg: "Файл {{.PATH}} не существует. Пожалуйста, создайте его перед запуском задачи."
+    cmds:
+      - echo 'Файл {{.PATH}} существует, продолжаем выполнение задачи...'
+
+  generate-dump:
+    desc: "Генерация дампа Zulu базы данных"
+    cmds:
+      - |
+        pg_dump -U sl-admin -h 89.169.169.108 -p 6432 zulu --no-owner \
+        --exclude-table=public.object_state_configuration_old \
+        --exclude-table=public.measure_points_excel \
+        --exclude-table=public.tmp_measure_points \
+        > docker/init-scripts/dump.sql
+
+  list-envs:
+    desc: "Показать доступные среды"
+    silent: true
+    cmds:
+      - |
+        echo "Доступные среды:"
+        for env in $(ls env/*.sh | xargs -n 1 basename | sed 's/.sh$//'); do
+          if [ -f "docker/${env}-docker-compose.yml" ]; then
+            echo "  - $env"
+          fi
+        done
+
+  help:
+    desc: "Вывод списка доступных задач"
+    cmds:
+      - task --list

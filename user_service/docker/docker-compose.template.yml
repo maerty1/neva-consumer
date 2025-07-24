@@ -1,0 +1,33 @@
+services:
+  user_service:
+    container_name: user_service
+    restart: unless-stopped
+    ports:
+      - "8001:8001"
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    environment:
+      USER__MAX_CONNECTIONS: 1
+      USER__CONNECTION_IDLE_TIME_SEC: 10
+      USER__POSTGRESQL_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${USER_POSTGRES_DB_NAME}?sslmode=require
+      USER__HTTP_HOST: '0.0.0.0'
+      USER__HTTP_PORT: 8001
+      GIN_MODE: 'release'
+    # volumes:
+    #   - ../pkg:/code/pkg
+    #   - ../api:/code/api
+    #   - ../cmd:/code/cmd
+    #   - ../docs:/code/docs
+    #   - ../internal:/code/internal
+    networks:
+      - user
+      - bff
+
+networks:
+  user:
+    name: user
+    external: true
+  bff:
+    name: bff
+    external: true

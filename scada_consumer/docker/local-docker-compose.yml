@@ -1,0 +1,61 @@
+name: scada_consumer
+
+services:
+  scada_consumer:
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    depends_on:
+      scada_db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=scada_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+      - RABBITMQ_URL
+      - RABBITMQ_CONSUMER_QUEUE
+      - RABBITMQ_CONSUMER_TAG
+      - RABBITMQ_DAILY_QUEUE
+      - RABBITMQ_ASAP_QUEUE
+      - RABBITMQ_10MIN_QUEUE
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal
+
+  scada_db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      - POSTGRES_USER=${POSTGRES_DB_LOGIN}
+      - POSTGRES_PASSWORD=${POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB_NAME}
+      - PGUSER=${POSTGRES_DB_LOGIN}
+    ports:
+      - "${POSTGRES_DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      timeout: 2s
+      retries: 15
+
+  rabbitmq:
+    hostname: rabbitmq
+    image: rabbitmq:3.13.6-alpine
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: "admin"
+      RABBITMQ_DEFAULT_PASS: "pYEDBqnMLoWWE"
+    healthcheck:
+      test: ["CMD-SHELL", "rabbitmq-diagnostics -q ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

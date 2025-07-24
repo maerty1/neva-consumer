@@ -1,0 +1,29 @@
+name: dp_zulu_service
+
+services:
+  zulu_service:
+    restart: unless-stopped
+    ports:
+      - "${ZULU__HTTP_PORT}:${ZULU__HTTP_PORT}"
+    build:
+      context: ../
+      dockerfile: air.Dockerfile
+    environment:
+      - ZULU__POSTGRES_DB_LOGIN
+      - ZULU__POSTGRES_DB_PASSWORD
+      - ZULU__POSTGRES_DB_HOST
+      - ZULU__POSTGRES_DB_PORT
+      - ZULU__POSTGRES_DB_NAME
+      - ZULU__MAX_CONNECTIONS
+      - ZULU__CONNECTION_IDLE_TIME_SEC
+      - ZULU__POSTGRESQL_URL
+      - ZULU__HTTP_HOST
+      - ZULU__HTTP_PORT
+      - GIN_MODE
+    volumes:
+      - ../pkg:/code/pkg
+      - ../api:/code/api
+      - ../files:/code/files
+      - ../cmd:/code/cmd
+      - ../docs:/code/docs
+      - ../internal:/code/internal

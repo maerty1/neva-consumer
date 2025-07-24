@@ -1,0 +1,17 @@
+services:
+  wsd-collector-handle:
+    container_name: wsd-collector-handle
+    restart: no
+    build:
+      context: ../
+      dockerfile: Handle.Dockerfile
+    environment:
+      TIME_FROM: "2024-12-02 12:35"
+      TIME_TO: "2024-12-02 12:45"
+      CONNECTION_IDLE_TIME_SEC: 100000
+      FORECAST_API_TOKEN: ${FORECAST_API_TOKEN}
+      FORECAST_BASE_URL: https://api.openweathermap.org
+      NETWORK_PROTOCOL: http
+      POSTGRES_MAX_CONNECTIONS: 100
+      POSTGRESQL_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@{POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB_NAME}?sslmode=require
+      WEATHER_STATION_BASE_URL: ${WEATHER_STATION_BASE_URL}

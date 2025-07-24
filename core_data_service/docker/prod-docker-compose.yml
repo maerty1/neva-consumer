@@ -1,0 +1,18 @@
+name: dp_core_data_service
+services:
+  core_data_service:
+    working_dir: /code/src
+    command: uvicorn --log-level debug app:app --host $CORE__APP_HOST --port $CORE__APP_PORT --reload
+    build: ..
+    environment:
+      - CORE__POSTGRES_DB_LOGIN
+      - CORE__POSTGRES_DB_PASSWORD
+      - CORE__POSTGRES_DB_HOST
+      - CORE__POSTGRES_DB_PORT
+      - CORE__POSTGRES_DB_NAME
+      - CORE__SQLALCHEMY_ECHO
+      - CORE__SQLALCHEMY_POOL_SIZE
+    ports:
+      - "${CORE__APP_PORT}:${CORE__APP_PORT}"
+    volumes:
+      - ../src:/code/src

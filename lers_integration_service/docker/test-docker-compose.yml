@@ -1,0 +1,23 @@
+name: lers_tests
+
+services:
+  lers_integration_tests:
+    build:
+      context: ../
+      dockerfile: ./docker/test.Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+      - TESTS_BASE_DIR
+    volumes:
+      - ../pkg:/code/pkg
+      - ../api:/code/api
+      - ../cmd:/code/cmd
+      - ../docs:/code/docs
+      - ../internal:/code/internal
+    privileged: true

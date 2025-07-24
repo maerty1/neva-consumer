@@ -1,0 +1,30 @@
+services:
+  zulu_updater:
+    container_name: zulu_updater
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    restart: always
+    environment:
+      ELEM_ID: 3580
+      ROOT_CONNECTION_IDLE_TIME_SEC: 100000
+      ROOT_POSTGRES_MAX_CONNECTIONS: 100
+      ROOT_POSTGRESQL_URL: postgres://${ROOT_POSTGRES_USER}:${ROOT_POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/root?sslmode=require
+      WEATHER_BASE_URL: http://core_data_service:8002
+      ZULU_BASE_URL: http://89.223.70.228:6473
+      ZULU_CONNECTION_IDLE_TIME_SEC: 100000
+      ZULU_LAYER: slanzi:SlanziHeatingNetwork
+      ZULU_POSTGRES_MAX_CONNECTIONS: 100
+      ZULU_POSTGRESQL_URL: postgres://${ZULU_POSTGRES_USER}:${ZULU_POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/zulu?sslmode=require
+      ZULU_TOKEN: ${ZULU_TOKEN}
+    networks:
+      - consumer
+      - core
+
+networks:
+  consumer:
+    name: consumer
+    external: true
+  core:
+    name: core
+    external: true

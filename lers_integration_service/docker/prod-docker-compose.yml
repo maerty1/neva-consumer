@@ -1,0 +1,41 @@
+name: integration_service_prod
+
+services:
+  lers:
+    restart: no
+    profiles: ["main"]
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST
+      - POSTGRES_DB_PORT
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_DB_NAME}?sslmode=require
+      - POSTGRES_MAX_CONNECTIONS
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal
+
+  lers_synchronizer:
+    profiles: ["sync"]
+    restart: no
+    container_name: syncer
+    build:
+      context: ../
+      dockerfile: synchronizer.Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST
+      - POSTGRES_DB_PORT
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:${POSTGRES_DB_PORT}/${POSTGRES_DB_NAME}?sslmode=require
+      - POSTGRES_MAX_CONNECTIONS
+    volumes:
+      - ../pkg:/code/pkg
+      - ../cmd:/code/cmd
+      - ../internal:/code/internal

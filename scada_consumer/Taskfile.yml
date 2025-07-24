@@ -1,0 +1,52 @@
+version: "3"
+
+vars:
+  LOCAL_ENV_FILE: "env/local.sh"
+  PROD_ENV_FILE: "env/prod.sh"
+  TEST_ENV_FILE: "env/test.sh"
+  LOCAL_COMPOSE_FILE: "docker/local-local-docker-compose.yml"
+  PROD_COMPOSE_FILE: "docker/prod-local-docker-compose.yml"
+  TEST_COMPOSE_FILE: "docker/test-local-docker-compose.yml"
+
+tasks:
+  migration:
+    desc: "Запуск миграции базы данных"
+    cmds:
+      - source {{.LOCAL_ENV_FILE}} cd ../_migrations && migrate -database "$POSTGRESQL_URL" -path versions up
+
+  migration-down:
+    desc: "Откат миграции базы данных"
+    cmds:
+      - source {{.LOCAL_ENV_FILE}} cd ../_migrations && migrate -database "$POSTGRESQL_URL" -path versions down
+
+  migration-generate:
+    desc: "Генерация миграции. Пример: task migration-generate NAME=test_migration_name"
+    vars:
+      NAME: "{{.NAME}}"
+    cmds:
+      - source {{.LOCAL_ENV_FILE}} cd ../_migrations && migrate create -ext sql -dir versions "{{.NAME}}"
+
+  local:
+    desc: "Запуск локальной среды"
+    cmds:
+      - source {{.LOCAL_ENV_FILE}} && docker compose -f {{.LOCAL_COMPOSE_FILE}} up -d
+
+  prod:
+    desc: "Запуск prod среды"
+    cmds:
+      - source {{.PROD_ENV_FILE}} && docker compose -f {{.PROD_COMPOSE_FILE}} up -d
+
+  test:
+    desc: "Запуск тестов"
+    cmds:
+      - source {{.TEST_ENV_FILE}} && docker compose -f {{.TEST_COMPOSE_FILE}} up --build -d
+
+  local-build:
+    desc: "Запуск локальной среды с опцией сборки"
+    cmds:
+      - source {{.LOCAL_ENV_FILE}} && docker compose -f {{.LOCAL_COMPOSE_FILE}} up --build -d
+
+  prod-build:
+    desc: "Запуск prod среды с опцией сборки"
+    cmds:
+      - source {{.PROD_ENV_FILE}} && docker compose -f {{.PROD_COMPOSE_FILE}} up --build -d

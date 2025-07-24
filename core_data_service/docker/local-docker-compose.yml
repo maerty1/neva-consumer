@@ -1,0 +1,39 @@
+name: core_local
+services:
+  core_data_service:
+    working_dir: /code/src
+    command: uvicorn --log-level debug app:app --host $CORE__APP_HOST --port $CORE__APP_PORT --reload
+    depends_on:
+      db:
+        condition: service_healthy
+    build: ..
+    environment:
+      - CORE__POSTGRES_DB_LOGIN
+      - CORE__POSTGRES_DB_PASSWORD
+      - CORE__POSTGRES_DB_HOST
+      - CORE__POSTGRES_DB_PORT
+      - CORE__POSTGRES_DB_NAME
+      - CORE__SQLALCHEMY_ECHO
+      - CORE__SQLALCHEMY_POOL_SIZE
+    ports:
+      - "${CORE__APP_PORT}:${CORE__APP_PORT}"
+    volumes:
+      - ../src:/code/src
+
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    hostname: ${CORE__POSTGRES_DB_HOST}
+    environment:
+      - POSTGRES_USER=${CORE__POSTGRES_DB_LOGIN}
+      - POSTGRES_PASSWORD=${CORE__POSTGRES_DB_PASSWORD}
+      - POSTGRES_DB=${CORE__POSTGRES_DB_NAME}
+      - PGUSER=${CORE__POSTGRES_DB_LOGIN}
+    ports:
+      - "${CORE__POSTGRES_DB_PORT}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      timeout: 2s
+      retries: 15
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d

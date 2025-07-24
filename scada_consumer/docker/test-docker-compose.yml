@@ -1,0 +1,29 @@
+name: scada_tests
+
+services:
+  scada_consumer_tests:
+    build:
+      context: ../
+      dockerfile: ./docker/test.Dockerfile
+    environment:
+      - POSTGRES_DB_LOGIN
+      - POSTGRES_DB_PASSWORD
+      - POSTGRES_DB_HOST=scada_db
+      - POSTGRES_DB_PORT=5432
+      - POSTGRES_DB_NAME
+      - POSTGRESQL_URL=postgres://${POSTGRES_DB_LOGIN}:${POSTGRES_DB_PASSWORD}@${POSTGRES_DB_HOST}:5432/${POSTGRES_DB_NAME}?sslmode=disable
+      - POSTGRES_MAX_CONNECTIONS
+      - RABBITMQ_URL
+      - RABBITMQ_CONSUMER_QUEUE
+      - RABBITMQ_CONSUMER_TAG
+      - TESTS_BASE_DIR
+      - RABBITMQ_DAILY_QUEUE
+      - RABBITMQ_ASAP_QUEUE
+      - RABBITMQ_10MIN_QUEUE
+    volumes:
+      - ../pkg:/code/pkg
+      - ../api:/code/api
+      - ../cmd:/code/cmd
+      - ../docs:/code/docs
+      - ../internal:/code/internal
+    privileged: true

@@ -1,0 +1,1114 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "API сервис получения данных зулу",
+        "title": "Zulu Service API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "paths": {
+        "/zulu/api/v1/bi_dashboard/frame/1": {
+            "get": {
+                "description": "Каждый блок — это `Источник` (котельные)",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BI"
+                ],
+                "summary": "Получение первого фрейма BI дашборда",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/reports.BiDashboardFrame"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/bi_dashboard/frame/2/{element_id}": {
+            "get": {
+                "description": "Переменная element_id `Источник` получается из первого",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BI"
+                ],
+                "summary": "Получение второго фрейма BI дашборда",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/reports.BiDashboardFrame"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/bi_dashboard/frame/3/{element_id}": {
+            "get": {
+                "description": "Переменная element_id `ЦТП` получается из второго кадра",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BI"
+                ],
+                "summary": "Получение третьего фрейма BI дашборда",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/reports.BiDashboardFrame"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/bi_dashboard/frame/3/{element_id}/others": {
+            "get": {
+                "description": "Переменная element_id `Источник` получается из первого кадра. Используется для детализации информации по блоку `Остальное` из второго фрейма",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "BI"
+                ],
+                "summary": "Получение третьего фрейма BI дашборда при нажатии на \"Остальное\"",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/reports.BiDashboardFrame"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/elements/{element_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Geojson"
+                ],
+                "summary": "Получение значений объектов",
+                "responses": {
+                    "200": {
+                        "description": "Список значений объектов",
+                        "schema": {
+                            "$ref": "#/definitions/geodata.ElementData"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/enums/measurement_groups": {
+            "get": {
+                "description": "Возвращает словарь групп измерений, где ключ — ID группы. `{\"1\": {\"name\": \"Температура\", \"unit\": \"°C\"}, \"2\": {\"name\": \"Давление\", \"unit\": \"атм\"}}`",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Enums"
+                ],
+                "summary": "Получение значений объектов",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/geodata.MeasurementGroupEnum"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/filtered_points": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "Получение значений объектов",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "ID типов объектов для фильтрации",
+                        "name": "zws_type_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/geodata.Point"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/geojson": {
+            "get": {
+                "description": "Возвращает коллекцию географических объектов в формате GeoJSON.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Geojson"
+                ],
+                "summary": "Получение GeoJSON данных",
+                "responses": {
+                    "200": {
+                        "description": "GeoJSON FeatureCollection",
+                        "schema": {
+                            "$ref": "#/definitions/geojson.GeoJSONFeatureCollection"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/pipeline_depths": {
+            "get": {
+                "description": "Получение глубину нахождения труб под землей",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Pipeline"
+                ],
+                "summary": "Получение глубину нахождения труб под землей",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/geodata.PipelineDepth"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Points"
+                ],
+                "summary": "Получение значений объектов",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "ID типов объектов",
+                        "name": "zws_type_id",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/geodata.Point"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points/categories/:category_id": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "Получение значений объектов",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "ID типов объектов для фильтрации",
+                        "name": "zws_type_id",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Timestamp для получения данных за конкретный период",
+                        "name": "timestamp",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/geodata.GetPointsDataByCategoryGroup"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "...",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/geodata.GetPointsDataByCategoryGroup"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points/{element_id}/categories": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Categories"
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/geodata.PointWithCategories"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points/{element_id}/categories/{category_id}": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal"
+                ],
+                "parameters": [
+                    {
+                        "enum": [
+                            "group",
+                            "keyvalue"
+                        ],
+                        "type": "string",
+                        "description": "Type of data",
+                        "name": "type",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ответ для type=group",
+                        "schema": {
+                            "$ref": "#/definitions/geodata.GetPointDataByCategoryGroup"
+                        }
+                    },
+                    "201": {
+                        "description": "Ответ для type=keyvalue",
+                        "schema": {
+                            "$ref": "#/definitions/geodata.GetPointDataByCategoryKeyvalue"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points/{element_id}/full": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "...",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/geodata.FullElementData"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points/{element_id}/icon": {
+            "get": {
+                "description": "Возвращает файл иконки для заданного элемента (element_id)",
+                "tags": [
+                    "Schemas"
+                ],
+                "summary": "Получить иконку по элементу",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID элемента",
+                        "name": "element_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Файл иконки",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный elementID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Файл не найден",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/points/{element_id}/schema": {
+            "get": {
+                "description": "Возвращает файл схемы для заданного элемента (element_id)",
+                "tags": [
+                    "Schemas"
+                ],
+                "summary": "Получить схему по элементу",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "ID элемента",
+                        "name": "element_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Файл схемы",
+                        "schema": {
+                            "type": "file"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный elementID",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Файл не найден",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v1/states": {
+            "get": {
+                "description": "Возвращает список состояний объектов из словаря `zulu.dict_object_states`.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Geojson"
+                ],
+                "summary": "Получение состояний объектов",
+                "responses": {
+                    "200": {
+                        "description": "Список состояний объектов",
+                        "schema": {
+                            "$ref": "#/definitions/geodata.ObjectStatesResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v2/geojson": {
+            "get": {
+                "description": "Возвращает коллекцию географических объектов в формате GeoJSON.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Geojson"
+                ],
+                "summary": "Получение GeoJSON данных",
+                "responses": {
+                    "200": {
+                        "description": "GeoJSON FeatureCollection",
+                        "schema": {
+                            "$ref": "#/definitions/geojson.GeoJSONFeatureCollectionV2"
+                        }
+                    }
+                }
+            }
+        },
+        "/zulu/api/v2/points/categories/:category_id": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Internal"
+                ],
+                "summary": "Получение значений объектов",
+                "parameters": [
+                    {
+                        "type": "array",
+                        "items": {
+                            "type": "integer"
+                        },
+                        "collectionFormat": "csv",
+                        "description": "ID типов объектов для фильтрации",
+                        "name": "zws_type_ids",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Timestamp для получения данных за конкретный период",
+                        "name": "timestamp",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "$ref": "#/definitions/geodata.GetPointsDataByCategoryGroup"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "geodata.Category": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer"
+                },
+                "is_open": {
+                    "type": "boolean"
+                },
+                "max_values": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Метрики"
+                },
+                "type": {
+                    "type": "string",
+                    "example": "group"
+                }
+            }
+        },
+        "geodata.ElementData": {
+            "type": "object",
+            "properties": {
+                "inserted_ts": {
+                    "type": "string",
+                    "example": "2024-10-08T10:56:45.531005Z"
+                },
+                "parameter": {
+                    "type": "string",
+                    "example": "sys"
+                },
+                "record_type": {
+                    "type": "string",
+                    "example": "static"
+                },
+                "val": {
+                    "type": "string",
+                    "example": "1"
+                }
+            }
+        },
+        "geodata.FullElementData": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string"
+                },
+                "packets": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/definitions/geodata.Measurement"
+                        }
+                    }
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        },
+        "geodata.GetPointDataByCategoryGroup": {
+            "type": "object",
+            "properties": {
+                "measurements": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object",
+                        "additionalProperties": {
+                            "$ref": "#/definitions/geodata.GroupMeasurement"
+                        }
+                    }
+                }
+            }
+        },
+        "geodata.GetPointDataByCategoryKeyvalue": {
+            "type": "object",
+            "properties": {
+                "measurements": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/geodata.MeasurementKeyvalue"
+                    }
+                }
+            }
+        },
+        "geodata.GetPointsDataByCategoryGroup": {
+            "type": "object",
+            "properties": {
+                "measurements": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/geodata.GroupMeasurement"
+                    }
+                }
+            }
+        },
+        "geodata.GroupMeasurement": {
+            "type": "object",
+            "properties": {
+                "calculated_data": {
+                    "$ref": "#/definitions/geodata.GroupMeasurementsCalculatedData"
+                },
+                "data": {
+                    "$ref": "#/definitions/geodata.GroupMeasurementsData"
+                },
+                "lers_coeff": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "Температура"
+                },
+                "rn": {
+                    "type": "integer"
+                },
+                "unit": {
+                    "type": "string",
+                    "example": "атм"
+                },
+                "zulu_coeff": {
+                    "type": "number"
+                }
+            }
+        },
+        "geodata.GroupMeasurementsCalculatedData": {
+            "type": "object",
+            "properties": {
+                "in": {
+                    "type": "number"
+                },
+                "out": {
+                    "type": "number"
+                }
+            }
+        },
+        "geodata.GroupMeasurementsData": {
+            "type": "object",
+            "properties": {
+                "in": {
+                    "type": "string",
+                    "example": "T_in"
+                },
+                "out": {
+                    "type": "string",
+                    "example": "T_out"
+                }
+            }
+        },
+        "geodata.Measurement": {
+            "type": "object",
+            "properties": {
+                "calculated_data": {
+                    "$ref": "#/definitions/geodata.MeasurementCalculatedData"
+                },
+                "data": {
+                    "$ref": "#/definitions/geodata.MeasurementData"
+                },
+                "lers_coeff": {
+                    "type": "number"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "unit": {
+                    "type": "string"
+                },
+                "zulu_coeff": {
+                    "type": "number"
+                }
+            }
+        },
+        "geodata.MeasurementCalculatedData": {
+            "type": "object",
+            "properties": {
+                "in": {
+                    "type": "number"
+                },
+                "out": {
+                    "type": "number"
+                }
+            }
+        },
+        "geodata.MeasurementData": {
+            "type": "object",
+            "properties": {
+                "in": {
+                    "type": "string"
+                },
+                "out": {
+                    "type": "string"
+                }
+            }
+        },
+        "geodata.MeasurementGroup": {
+            "type": "object",
+            "properties": {
+                "coeff": {
+                    "type": "number"
+                },
+                "i": {
+                    "type": "string",
+                    "example": "T_in"
+                },
+                "o": {
+                    "type": "string",
+                    "example": "T_out"
+                }
+            }
+        },
+        "geodata.MeasurementGroupEnum": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Температура"
+                },
+                "unit": {
+                    "type": "string",
+                    "example": "°C"
+                }
+            }
+        },
+        "geodata.MeasurementKeyvalue": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "example": "Температура"
+                },
+                "rn": {
+                    "type": "integer"
+                },
+                "source": {
+                    "type": "string",
+                    "example": "zulu/scada"
+                },
+                "unit": {
+                    "type": "string",
+                    "example": "атм"
+                },
+                "value": {}
+            }
+        },
+        "geodata.ObjectState": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "description": "Изображение состояния в формате data URL (base64)",
+                    "type": "string",
+                    "example": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEgAAABICAYA"
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Разветвление"
+                },
+                "zws_mode": {
+                    "type": "integer",
+                    "example": 2
+                },
+                "zws_type": {
+                    "type": "integer",
+                    "example": 2
+                }
+            }
+        },
+        "geodata.ObjectStatesResponse": {
+            "type": "object",
+            "properties": {
+                "states": {
+                    "description": "Массив состояний объектов",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/geodata.ObjectState"
+                    }
+                }
+            }
+        },
+        "geodata.PipelineDepth": {
+            "type": "object",
+            "properties": {
+                "avg_h_geo": {
+                    "type": "number"
+                },
+                "end_h_geo": {
+                    "type": "number"
+                },
+                "start_h_geo": {
+                    "type": "number"
+                }
+            }
+        },
+        "geodata.Point": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Улица Пушкина 12"
+                },
+                "coordinates": {
+                    "type": "array",
+                    "items": {
+                        "type": "number"
+                    },
+                    "example": [
+                        55.751244,
+                        37.618423
+                    ]
+                },
+                "elem_id": {
+                    "type": "integer"
+                },
+                "has_accident": {
+                    "type": "boolean"
+                },
+                "measurement_groups": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "$ref": "#/definitions/geodata.MeasurementGroup"
+                    }
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Котельная 22"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "geodata.PointWithCategories": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "type": "string",
+                    "example": "Улица Пушкина 12"
+                },
+                "categories": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/geodata.Category"
+                    }
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Котельная 22"
+                },
+                "type": {
+                    "type": "integer"
+                }
+            }
+        },
+        "geojson.GeoJSONFeature": {
+            "type": "object",
+            "properties": {
+                "geometry": {
+                    "description": "Геометрия объекта",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/geojson.Geometry"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "Уникальный идентификатор объекта",
+                    "type": "integer",
+                    "example": 1320
+                },
+                "properties": {
+                    "description": "Свойства объекта",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/geojson.Properties"
+                        }
+                    ]
+                },
+                "type": {
+                    "description": "Тип объекта, всегда \"Feature\"",
+                    "type": "string",
+                    "example": "Feature"
+                }
+            }
+        },
+        "geojson.GeoJSONFeatureCollection": {
+            "type": "object",
+            "properties": {
+                "features": {
+                    "description": "Массив объектов Feature",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/geojson.GeoJSONFeature"
+                    }
+                },
+                "type": {
+                    "description": "Тип объекта, всегда \"FeatureCollection\"",
+                    "type": "string",
+                    "example": "FeatureCollection"
+                }
+            }
+        },
+        "geojson.GeoJSONFeatureCollectionV2": {
+            "type": "object",
+            "properties": {
+                "features": {
+                    "description": "Массив объектов Feature",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/geojson.GeoJSONFeatureV2"
+                    }
+                },
+                "type": {
+                    "description": "Тип объекта, всегда \"FeatureCollection\"",
+                    "type": "string",
+                    "example": "FeatureCollection"
+                }
+            }
+        },
+        "geojson.GeoJSONFeatureV2": {
+            "type": "object",
+            "properties": {
+                "geometry": {
+                    "description": "Геометрия объекта",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/geojson.Geometry"
+                        }
+                    ]
+                },
+                "id": {
+                    "description": "Уникальный идентификатор объекта",
+                    "type": "integer",
+                    "example": 1320
+                },
+                "properties": {
+                    "description": "Свойства объекта",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/geojson.PropertiesV2"
+                        }
+                    ]
+                },
+                "type": {
+                    "description": "Тип объекта, всегда \"Feature\"",
+                    "type": "string",
+                    "example": "Feature"
+                }
+            }
+        },
+        "geojson.Geometry": {
+            "type": "object",
+            "properties": {
+                "coordinates": {
+                    "description": "Координаты геометрии",
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "number"
+                        }
+                    }
+                },
+                "type": {
+                    "description": "Тип геометрии, например, \"LineString\"",
+                    "type": "string",
+                    "example": "LineString"
+                }
+            }
+        },
+        "geojson.Properties": {
+            "type": "object",
+            "properties": {
+                "elem_id": {
+                    "description": "Идентификатор элемента",
+                    "type": "integer",
+                    "example": 1320
+                },
+                "parent_id": {
+                    "description": "Идентификатор родительского элемента",
+                    "type": "integer",
+                    "example": 3058
+                },
+                "zws_linecolor": {
+                    "description": "Цвет линии в формате целого числа",
+                    "type": "integer",
+                    "example": 10966016
+                },
+                "zws_mode": {
+                    "description": "Режим объекта",
+                    "type": "integer",
+                    "example": 1
+                },
+                "zws_type": {
+                    "description": "Тип объекта",
+                    "type": "integer",
+                    "example": 6
+                }
+            }
+        },
+        "geojson.PropertiesV2": {
+            "type": "object",
+            "properties": {
+                "Adres": {
+                    "type": "string",
+                    "example": "Пушкина 15"
+                },
+                "Name": {
+                    "type": "string",
+                    "example": "П-427"
+                },
+                "elem_id": {
+                    "description": "Идентификатор элемента",
+                    "type": "integer",
+                    "example": 1320
+                },
+                "parent_id": {
+                    "description": "Идентификатор родительского элемента",
+                    "type": "integer",
+                    "example": 3058
+                },
+                "zws_linecolor": {
+                    "description": "Цвет линии в формате целого числа",
+                    "type": "integer",
+                    "example": 10966016
+                },
+                "zws_mode": {
+                    "description": "Режим объекта",
+                    "type": "integer",
+                    "example": 1
+                },
+                "zws_type": {
+                    "description": "Тип объекта",
+                    "type": "integer",
+                    "example": 6
+                }
+            }
+        },
+        "reports.BiDashboardFrame": {
+            "type": "object",
+            "properties": {
+                "block_id": {
+                    "type": "integer"
+                },
+                "block_name": {
+                    "type": "string",
+                    "example": "Котельная №16"
+                },
+                "qsum": {
+                    "type": "number",
+                    "example": 23.13
+                }
+            }
+        }
+    }
+}

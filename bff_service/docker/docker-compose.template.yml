@@ -1,0 +1,69 @@
+services:
+  bff_service:
+    container_name: bff_service
+    restart: unless-stopped
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    # ports:
+    #   - "8003:8003"
+    environment:
+      BFF__HTTP_HOST: "0.0.0.0"
+      BFF__HTTP_PORT: 8003
+      JWT_SECRET: ${JWT_SECRET}
+      USERS_HTTP_SERVICE_URL: "http://user_service:8001"
+      CORE_DATA_SERVICE_HTTP_SERVICE_URL: "http://core_data_service:8002"
+      ZULU_SERVICE_HTTP_SERVICE_URL: "http://zulu_service:8004"
+      GIN_MODE: "release"
+    # volumes:
+    #   - ../pkg:/code/pkg
+    #   - ../cmd:/code/cmd
+    #   - ../internal:/code/internal
+    #   - ../docs:/code/docs
+    #   - ../templates:/code/templates
+    networks:
+      - bff
+      - user
+      - core
+
+  nginx:
+    container_name: nginx
+    restart: unless-stopped
+    image: nginx:stable-alpine3.20
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /opt/nginx/conf/nginx.conf:/etc/nginx/nginx.conf:ro
+      - /opt/nginx/conf/conf.d/:/etc/nginx/conf.d/:ro
+      - /opt/nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - bff_service
+    networks:
+      - bff
+      - user
+      - frontend
+      - zulu
+
+networks:
+  bff:
+    name: bff
+    external: true
+  core:
+    name: core
+    external: true
+  user:
+    name: user
+    external: true
+  lers:
+    name: lers
+    external: true
+  scada:
+    name: scada
+    external: true
+  zulu:
+    name: zulu
+    external: true 
+  frontend:
+    name: frontend
+    external: true  

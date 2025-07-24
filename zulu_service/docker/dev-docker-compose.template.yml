@@ -1,0 +1,34 @@
+name: dev-dp_zulu_service
+
+services:
+  dev-zulu_service:
+    restart: unless-stopped
+    # ports:
+    #   - "8004:8004"
+    build:
+      context: ../
+      dockerfile: Dockerfile
+    environment:
+      ZULU__MAX_CONNECTIONS: '1'
+      ZULU__CONNECTION_IDLE_TIME_SEC: '10'
+      ZULU__HTTP_HOST: '0.0.0.0'
+      ZULU__HTTP_PORT: '8004'
+      GIN_MODE: release
+      ZULU__POSTGRESQL_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${ZULU_POSTGRES_DB_NAME}?sslmode=require
+    # volumes:
+    #   - ../pkg:/code/pkg
+    #   - ../api:/code/api
+    #   - ../cmd:/code/cmd
+    #   - ../docs:/code/docs
+    #   - ../internal:/code/internal
+    networks:
+      - zulu
+      - bff
+
+networks:
+  zulu:
+    name: zulu
+    external: true
+  bff:
+    name: bff
+    external: true
